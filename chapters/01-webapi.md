@@ -321,14 +321,51 @@ struct SongRow: View {
 ### ビューの構成
 
 ```swift
-// 該当部分のコードを抜粋して貼る
+var body: some View {
+    NavigationStack {
+        VStack {
+            // 検索バー
+            HStack {
+                TextField("アーティスト名を入力", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+
+                Button("検索") {
+                    Task {
+                        await searchMusic()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(searchText.isEmpty)
+            }
+            .padding(.horizontal)
+
+            // 検索結果
+            if isLoading {
+                ProgressView("検索中...")
+                    .padding()
+                Spacer()
+            } else if songs.isEmpty {
+                ContentUnavailableView(
+                    "曲を検索してみよう",
+                    systemImage: "music.note",
+                    description: Text("アーティスト名を入力して検索ボタンを押してください")
+                )
+            } else {
+                List(songs) { song in
+                    SongRow(song: song)
+                }
+            }
+        }
+        .navigationTitle("Music Search")
+    }
+}
 ```
 
-**何をしているか：**
+**検索画面を作成し、検索バー・検索ボタン・検索結果を表示しています。検索中や検索結果がない場合は、それぞれの画面を表示します。：**
 
-**なぜこう書くのか：**
+**検索画面を見やすく作り、検索状況に応じて表示内容を切り替えられるようにするためです。：**
 
-**もしこう書かなかったら：**
+**検索画面や検索結果が表示されず、楽曲を検索できないアプリになってしまいます。：**
 
 ---
 
